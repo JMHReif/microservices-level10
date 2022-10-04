@@ -1,0 +1,108 @@
+version: "3.9"
+services:
+  goodreads-db:
+    container_name: goodreads-db
+    image: jmreif/mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=Testing123
+    ports:
+      - "27017:27017"
+    volumes:
+      - $HOME/Projects/docker/mongoBooks/data:/data/db
+      - $HOME/Projects/docker/mongoBooks/logs:/logs
+      - $HOME/Projects/docker/mongoBooks/tmp:/tmp
+    networks:
+      - goodreads
+  goodreads-config:
+    container_name: goodreads-config
+    image: jmreif/goodreads-config:lvl10
+    # build: ./config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - goodreads-db
+    environment:
+      - SPRING_PROFILES_ACTIVE=native,docker
+    volumes:
+      - $HOME/Projects/config/microservices-java-config:/config
+      - $HOME/Projects/docker/goodreads/config-server/logs:/logs
+    networks:
+      - goodreads
+  goodreads-svc1:
+    container_name: goodreads-svc1
+    image: jmreif/goodreads-svc1:lvl10
+    # build: ./service1
+    ports:
+      - "8081:8081"
+    depends_on:
+      - goodreads-config
+    restart: on-failure
+    environment:
+      - SPRING_APPLICATION_NAME=mongo-client
+      - SPRING_CONFIG_IMPORT=configserver:http://goodreads-config:8888
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - goodreads
+  goodreads-svc2:
+    container_name: goodreads-svc2
+    image: jmreif/goodreads-svc2:lvl10
+    # build: ./service2
+    ports:
+      - "8080:8080"
+    depends_on:
+      - goodreads-svc1
+      - goodreads-config
+    restart: on-failure
+    environment:
+      - BACKEND_HOSTNAME=goodreads-svc1
+      - SPRING_APPLICATION_NAME=goodreads-client
+      - SPRING_CONFIG_IMPORT=configserver:http://goodreads-config:8888
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - goodreads
+  goodreads-svc3:
+    container_name: goodreads-svc3
+    image: jmreif/goodreads-svc3:lvl10
+    # build: ./service3
+    ports:
+      - "8082:8082"
+    depends_on:
+      - goodreads-config
+    restart: on-failure
+    environment:
+      - SPRING_APPLICATION_NAME=mongo-client
+      - SPRING_CONFIG_IMPORT=configserver:http://goodreads-config:8888
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - goodreads
+  goodreads-svc4:
+    container_name: goodreads-svc4
+    image: jmreif/goodreads-svc4:lvl10
+    # build: ./service4
+    ports:
+      - "8083:8083"
+    depends_on:
+      - goodreads-config
+    restart: on-failure
+    environment:
+      - SPRING_APPLICATION_NAME=neo4j-client
+      - SPRING_CONFIG_IMPORT=configserver:http://goodreads-config:8888
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - goodreads
+  goodreads-eureka:
+    container_name: goodreads-eureka
+    image: jmreif/goodreads-eureka
+    # build: ./eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=false
+      - EUREKA_CLIENT_FETCH-REGISTRY=false
+    volumes:
+      - $HOME/Projects/docker/goodreads/config-server/logs:/logs
+    networks:
+      - goodreads
+networks:
+  goodreads:
