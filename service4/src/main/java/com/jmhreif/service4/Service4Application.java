@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NonNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -22,7 +20,6 @@ import reactor.core.publisher.Flux;
 
 @SpringBootApplication
 @EnableRetry
-@EnableDiscoveryClient
 public class Service4Application {
 
 	public static void main(String[] args) {

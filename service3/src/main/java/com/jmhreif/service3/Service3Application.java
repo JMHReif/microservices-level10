@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NonNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -21,7 +19,6 @@ import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 @EnableRetry
-@EnableDiscoveryClient
 public class Service3Application {
 
 	public static void main(String[] args) {

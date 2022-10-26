@@ -55,7 +55,6 @@ services:
       - goodreads-config
     restart: on-failure
     environment:
-      - BACKEND_HOSTNAME=goodreads-svc1
       - SPRING_APPLICATION_NAME=goodreads-client
       - SPRING_CONFIG_IMPORT=configserver:http://goodreads-config:8888
       - SPRING_PROFILES_ACTIVE=docker

@@ -2,10 +2,9 @@ package com.jmhreif.service2;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
@@ -17,20 +16,17 @@ import reactor.core.publisher.Flux;
 
 @SpringBootApplication
 @EnableRetry
-@EnableDiscoveryClient
 public class Service2Application {
-	@Value("${backend.hostname:localhost}")
-	private String hostname;
-
 	public static void main(String[] args) {
 		SpringApplication.run(Service2Application.class, args);
 	}
 
 	@Bean
-	WebClient client() {
-		return WebClient.create("http://" + hostname + ":8081");
-	}
+	@LoadBalanced
+	WebClient.Builder createLoadBalancedBuilder() { return WebClient.builder(); }
 
+	@Bean
+	WebClient client(WebClient.Builder builder) { return builder.baseUrl("http://mongo-client").build(); }
 }
 
 @RestController
